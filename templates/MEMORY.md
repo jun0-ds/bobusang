@@ -1,0 +1,2 @@
+- [Identity](core/identity.md) — who you are, how you think
+- [Work style](core/work-style.md) — how AI should work with you
