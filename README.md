@@ -1,7 +1,8 @@
 # bobusang (보부상)
 
-> 마을과 마을 사이를 떠돌며 물건을 날랐던 행상인처럼,
-> bobusang은 기기와 기기 사이에서 AI의 기억을 나릅니다.
+> 100시간 대화한 AI, 기기 바꾸면 "안녕하세요, 무엇을 도와드릴까요?"
+
+> Your AI doesn't remember you. It never did.
 
 Windows, WSL, Linux 서버를 넘나드는 Claude Code 멀티디바이스 메모리 시스템.
 
