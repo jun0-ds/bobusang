@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+# bobusang pre-commit-encrypted
+#
+# Refuses commits that would silently break the repo's encryption state.
+# This hook is the mandatory pre-commit defense described in v2.2 rev 3.
+#
+# Rules enforced:
+#   1. Any staged file at an encrypted path (one matched by a filter=crypt entry
+#      in .gitattributes) MUST start with "U2FsdGVk" — base64 for "Salted__",
+#      the transcrypt ciphertext header. If not, refuse.
+#   2. If a file is renamed OUT of an encrypted path (encrypted → plaintext),
+#      refuse and tell the user to use `bobusang reclassify`.
+#   3. A rename INTO an encrypted path (plaintext → encrypted) is allowed, but
+#      the destination content is still verified as ciphertext.
+#
+# Structural limitations:
+#   - `--no-verify` bypasses this hook. Defense-in-depth lives in the
+#     session-start check, which scans the repo independently.
+#   - Simple glob handling: supports `path/**` patterns. Complex patterns
+#     should be validated via `git check-attr filter` (TODO).
+#
+# Install:
+#   cp contrib/hooks/pre-commit-encrypted .git/hooks/pre-commit
+#   chmod +x .git/hooks/pre-commit
+#
+# Proven against transcrypt 2.3.1 in Spike C (see docs/design/spike-C-precommit.md).
+
+set -euo pipefail
+
+# Ciphertext header we require for encrypted paths.
+readonly CIPHERTEXT_HEADER="U2FsdGVk"
+
+if [[ ! -f .gitattributes ]]; then
+    exit 0
+fi
+
+# Parse .gitattributes for patterns with filter=crypt
+ENCRYPTED_PATTERNS=()
+while IFS= read -r line; do
+    [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+    if [[ "$line" == *filter=crypt* ]]; then
+        pattern="${line%%[[:space:]]*}"
+        ENCRYPTED_PATTERNS+=("$pattern")
+    fi
+done < .gitattributes
+
+if [[ ${#ENCRYPTED_PATTERNS[@]} -eq 0 ]]; then
+    exit 0
+fi
+
+is_encrypted_path() {
+    local path="$1"
+    for pat in "${ENCRYPTED_PATTERNS[@]}"; do
+        # Strip /** suffix and check prefix.
+        # TODO: use `git check-attr filter -- "$path"` for full gitattributes semantics.
+        local prefix="${pat%/\*\*}"
+        if [[ "$path" == "$prefix"/* ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+verify_encrypted_path_has_ciphertext() {
+    local path="$1"
+    if is_encrypted_path "$path"; then
+        local blob
+        blob=$(git show ":$path" 2>/dev/null || echo "")
+        if [[ "${blob:0:8}" != "$CIPHERTEXT_HEADER" ]]; then
+            cat >&2 <<EOF
+bobusang pre-commit: REFUSED — $path is at an encrypted path but staged content is plaintext
+  Expected content to start with "$CIPHERTEXT_HEADER" (base64 Salted__).
+  Likely cause: transcrypt not unlocked on this device. Run: transcrypt --display
+  Or: the clean filter was bypassed (filter.crypt.clean not set to transcrypt).
+EOF
+            return 1
+        fi
+    fi
+    return 0
+}
+
+fail=0
+while IFS=$'\t' read -r status path rest; do
+    case "$status" in
+        A|M)
+            verify_encrypted_path_has_ciphertext "$path" || fail=1
+            ;;
+        R*)
+            old_path="$path"
+            new_path="$rest"
+            old_enc=0
+            new_enc=0
+            is_encrypted_path "$old_path" && old_enc=1
+            is_encrypted_path "$new_path" && new_enc=1
+            if [[ $old_enc -eq 1 && $new_enc -eq 0 ]]; then
+                cat >&2 <<EOF
+bobusang pre-commit: REFUSED — $old_path → $new_path crosses encryption boundary (encrypted → plaintext)
+  Use \`bobusang reclassify\` to make this change explicit.
+EOF
+                fail=1
+            fi
+            # Also verify destination content, regardless of direction.
+            verify_encrypted_path_has_ciphertext "$new_path" || fail=1
+            ;;
+    esac
+done < <(git diff --cached --name-status)
+
+exit $fail
