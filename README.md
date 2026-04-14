@@ -207,6 +207,10 @@ A: The memory structure is plain markdown — it works with anything. The hooks 
 - [Blog post: Building a multi-device memory system for Claude Code](#) *(coming soon)*
 - [sonmat](https://github.com/jun0-ds/sonmat) — Claude Code verification plugin by the same author
 
+## Prior art & influences
+
+- **[claude-mem](https://github.com/thedotmack/claude-mem)** by [@thedotmack](https://github.com/thedotmack) — a persistent memory compression system for Claude Code. bobusang's forthcoming v2.2 encrypted-memory design was sparked by studying claude-mem's `<private>` tag convention for marking sensitive content. In the end bobusang takes a different architectural path (directory-scoped file encryption via git-crypt at the git boundary, rather than tag-based stripping inside a compression pipeline), but the question "how should a memory system handle sensitive content?" was first raised for this project by reading claude-mem's source. See [docs/design/v2.1-private-tags.md](docs/design/v2.1-private-tags.md) and [docs/design/v2.2-git-crypt.md](docs/design/v2.2-git-crypt.md) for the full reasoning — including why the `<private>` tag approach was ultimately rejected for bobusang's specific threat model.
+
 ## License
 
 MIT — see `LICENSE`.
