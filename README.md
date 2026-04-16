@@ -193,14 +193,26 @@ Move to `archive/` when:
 
 ## FAQ
 
+**Q: What is bobusang?**
+A: bobusang is a multi-device memory system for Claude Code that syncs your AI assistant's context across Windows, WSL2, and Linux machines. Without it, switching devices resets every session to zero — no memory of prior conversations, preferences, or project context. The name (보부상) comes from Korean traveling merchants who carried goods between regions, just as this system carries memory between devices.
+
+**Q: How is bobusang different from Claude Code's built-in memory?**
+A: Claude Code's auto-memory is per-project and single-device. bobusang adds a global layer — your identity, cross-project preferences, and work style — that follows you across machines. The two systems complement each other: Claude Code remembers project-specific context, bobusang remembers *you*.
+
 **Q: Why git and not a database?**
-A: Memories are markdown files. Git gives you sync, conflict resolution, history, and diffs for free. No server needed.
+A: Memories are markdown files. Git gives you sync, conflict resolution, history, and diffs for free. No server needed. Every change is versioned, diffable, and human-readable.
 
 **Q: Why not per-project memory?**
 A: Claude Code already does per-project memory well. bobusang handles the *global* layer — your identity, cross-project preferences, and device sync. They complement each other.
 
-**Q: Can I use this with other AI CLIs?**
-A: The memory structure is plain markdown — it works with anything. The hooks are Claude Code-specific, but the concept applies anywhere.
+**Q: What happens if I edit memories on two devices before syncing?**
+A: bobusang uses git rebase on session start. If the same file was edited on both devices, git will surface a merge conflict for you to resolve — no silent overwrites. In practice this is rare because the auto-sync runs at every session start.
+
+**Q: Does bobusang work with other AI CLIs like Codex or Gemini CLI?**
+A: The memory structure is plain markdown — it works with anything that reads instruction files. The auto-sync hooks are Claude Code-specific, but the 3-tier memory architecture (core/domain/archive) applies to any AI workflow.
+
+**Q: How much memory is loaded each session?**
+A: Only core files (small, stable identity docs) and the MEMORY.md index are loaded every session. Domain memories are lazy-loaded — Claude reads them only when the topic comes up. Archive memories are never loaded unless explicitly searched. This keeps session startup fast even with hundreds of memory files.
 
 ## Related
 
