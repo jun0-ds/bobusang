@@ -225,4 +225,4 @@ A: Only core files (small, stable identity docs) and the MEMORY.md index are loa
 
 ## License
 
-MIT — see `LICENSE`.
+BSD 3-Clause — see `LICENSE`.
