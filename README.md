@@ -106,6 +106,20 @@ sync: [구조변경] description (HOSTNAME YYYY-MM-DD)     # config changes
 feat: description                                      # new capability
 ```
 
+## Marker block pattern
+
+`setup.sh` installs/updates a sync-section in `~/.claude/CLAUDE.md` using marker blocks:
+
+```
+<!-- bobusang:sync:start -->
+... sync section content (managed by setup.sh) ...
+<!-- bobusang:sync:end -->
+```
+
+Re-running `setup.sh` rewrites the content between markers — user edits *outside* markers are preserved, edits *inside* are overwritten on next update. To relocate the section, cut/paste the entire block (markers included); the next update finds it by marker.
+
+Other components (e.g. munteok framework's own setup.sh) can install their own marker IDs into the same `CLAUDE.md` — multiple components coexist.
+
 ## Multi-device setup
 
 ### Device identification

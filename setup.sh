@@ -49,6 +49,51 @@ copy_if_missing() {
   fi
 }
 
+# Install or update a marker-block section in a target file.
+# Usage: install_or_update_marker_block <file> <marker_id> <content_source_file>
+# - If markers exist in <file>: replaces content between them.
+# - If absent: appends the marker block to end of <file>.
+# User edits OUTSIDE markers are preserved; edits INSIDE markers get overwritten on update.
+install_or_update_marker_block() {
+  local file="$1" marker_id="$2" content_file="$3"
+  local start_marker="<!-- ${marker_id}:start -->"
+  local end_marker="<!-- ${marker_id}:end -->"
+
+  if [[ ! -f "$file" ]]; then
+    echo "  skip: ${marker_id} block (target file ${file} not found)"
+    return 0
+  fi
+  if [[ ! -f "$content_file" ]]; then
+    echo "  skip: ${marker_id} block (content source ${content_file} not found)"
+    return 0
+  fi
+
+  if grep -qF "$start_marker" "$file"; then
+    local tmpfile
+    tmpfile=$(mktemp)
+    awk -v start="$start_marker" -v end="$end_marker" -v cf="$content_file" '
+      $0 == start {
+        print
+        while ((getline line < cf) > 0) print line
+        close(cf)
+        in_block = 1
+        next
+      }
+      $0 == end { in_block = 0; print; next }
+      !in_block { print }
+    ' "$file" > "$tmpfile"
+    mv "$tmpfile" "$file"
+    echo "  updated: ${marker_id} block in $(basename "$file")"
+  else
+    {
+      printf '\n%s\n' "$start_marker"
+      cat "$content_file"
+      printf '%s\n' "$end_marker"
+    } >> "$file"
+    echo "  installed: ${marker_id} block appended to $(basename "$file")"
+  fi
+}
+
 echo ""
 echo "Installing templates..."
 copy_if_missing "$SCRIPT_DIR/templates/MEMORY.md" "$CLAUDE_DIR/memory/MEMORY.md"
@@ -90,6 +135,16 @@ if [[ ! -d "$CLAUDE_DIR/.git" ]]; then
 else
   echo ""
   echo "Git already initialized in ~/.claude/"
+fi
+
+# 6.5. Install/update CLAUDE.md sync section (marker block)
+echo ""
+if [[ -f "$CLAUDE_DIR/CLAUDE.md" ]]; then
+  echo "Installing CLAUDE.md sync section..."
+  install_or_update_marker_block "$CLAUDE_DIR/CLAUDE.md" "bobusang:sync" "$SCRIPT_DIR/templates/sync-section.md"
+else
+  echo "ℹ ~/.claude/CLAUDE.md not found — sync section install skipped."
+  echo "  Create CLAUDE.md and re-run setup.sh to auto-install."
 fi
 
 # 7. Add device to table
