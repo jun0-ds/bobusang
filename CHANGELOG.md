@@ -16,6 +16,9 @@ All notable changes to bobusang. Format loosely follows [Keep a Changelog](https
 - `templates/sync-section.md` — marker block 안에 들어갈 본문 (sync 절차·커밋 컨벤션 등)
 - `README.md` "Marker block pattern" 절 — 외부 사용자가 자기 도구에 같은 패턴 도입할 수 있는 reference
 
+### Changed (2026-05-25)
+- `templates/sync-section.md` — §6 sync 절 예시를 **env redirect 체계**로 갱신: sonmat state(scribe·memory)가 `.claude` 밖으로 이전되며 backward-compat symlink 2개(`~/.claude/sonmat/memory`, `~/control-tower/.claude/sonmat`) 은퇴 (sonmat v0.14.0 연계, 2026-05-23). maintainer instance(jun0-ds) 토폴로지 반영 — fork 시 교체 대상
+
 ### Changed (2026-05-22)
 - `templates/sync-section.md` 를 CLAUDE.md §6 전체 수준으로 확장 (브랜치 전략·두 리포 구조·자동/수동 sync·커밋 컨벤션·attribution·새 세션 권장). CLAUDE.md 카드 보드 전환(A 트랙)에서 §6 통째를 marker block으로 대체하기 위함. 상단에 "maintainer instance 예시 — fork 시 교체" 주석 + attribution 절 generic화(특정 user 값 제거)로 OSS portability 유지. sandbox 함수 검증 완료(5/20)
 

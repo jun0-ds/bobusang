@@ -15,12 +15,12 @@ main ← 모든 기기가 직접 push/pull
 | claude-config | `~/.claude/` | settings·hooks·CLAUDE.md·docs (+ sonmat 범용 ops 메모리·scribe 로그는 munteok로 이관됨 — `.gitignore`) | `hooks/sync-memory.sh` |
 | munteok-anchae | `~/control-tower/munteok-anchae/` | 글로벌 메모리·노트(`desk/{memory,notes}/`) + sonmat ops 메모리(`bedrock/sonmat-memory/`)·scribe 로그(`desk/sonmat/`) + hearth·bedrock·madang·devlog·docs | `hooks/sync-munteok.sh` |
 
-(`~/.claude/memory`·`~/.claude/notes`·`~/.claude/sonmat/memory`·`~/control-tower/.claude/sonmat`는 munteok-anchae 안을 가리키는 backward-compat symlink. claude-config `.gitignore`에서 제외 — 로컬 전용.)
+(`~/.claude/memory`·`~/.claude/notes`는 munteok-anchae 안을 가리키는 backward-compat symlink. claude-config `.gitignore`에서 제외 — 로컬 전용. sonmat state(memory·scribe)는 symlink 대신 **env redirect** — 2026-05-23, §sonmat.)
 
 ### 자동 싱크 (SessionStart)
 
 세션 시작 시 두 훅이 자동 실행, 둘 다 동일 절차:
-1. (sync-munteok.sh만) 리포 없으면 `git clone` + symlink 보장(`~/.claude/{memory,notes}`, `~/.claude/sonmat/memory`, `~/control-tower/.claude/sonmat`) — 새 기기 self-healing. 기존 기기에 옛 실디렉토리가 남아있으면 경고 + `hooks/migrate-to-munteok.sh` 안내(§device-setup-guide).
+1. (sync-munteok.sh만) 리포 없으면 `git clone` + symlink 보장(`~/.claude/{memory,notes}`) — 새 기기 self-healing. 기존 기기에 옛 실디렉토리가 남아있으면 경고 + `hooks/migrate-to-munteok.sh` 안내(§device-setup-guide). (sonmat state symlink는 2026-05-23 은퇴, env redirect로 대체.)
 2. main checkout (다른 브랜치에 있으면 전환)
 3. 로컬 변경 stash
 4. `git fetch origin && git rebase origin/main`
@@ -36,7 +36,7 @@ main ← 모든 기기가 직접 push/pull
 2. 최신화: `git fetch origin && git rebase origin/main`
 3. 상태 확인: `git status --short` → 변경 없으면 다음 리포로
 4. 스테이징: `git add settings.json CLAUDE.md hooks/ settings.local.d/ docs/ .gitignore`
-   - `projects/*/memory/`, `projects/**/*.jsonl`, `/memory`·`/notes`·`/sonmat/memory` symlink, `/sonmat/control-tower`는 .gitignore 대상 — 커밋하지 않음. sonmat ops 메모리·scribe 로그 변경은 munteok-anchae에서.
+   - `projects/*/memory/`, `projects/**/*.jsonl`, `/memory`·`/notes` symlink는 .gitignore 대상 — 커밋하지 않음. sonmat ops 메모리·scribe 로그 변경은 munteok-anchae에서 (env redirect — §sonmat).
 
 **munteok-anchae (`~/control-tower/munteok-anchae/`) — 메모리·노트 변경은 여기:**
 1. `cd ~/control-tower/munteok-anchae && git fetch origin && git rebase origin/main`
