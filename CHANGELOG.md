@@ -2,13 +2,19 @@
 
 All notable changes to bobusang. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
-**Versioning policy**: SemVer tag held back until external fork·breaking change·sustained API surface triggers it. Until then, changes accumulate under *Unreleased*.
+**Versioning policy**: SemVer 태그는 *기록·마일스톤* 목적으로 단다 — 외부 사용자/트리거를 기다리지 않는다 (2026-05-26 stance 정정: sonmat도 사용자가 아닌 plugin 메커니즘·기록으로 태깅을 시작했다). 0.x는 API 안정 전 baseline 스냅샷. SHA 단위는 `git log`, 사람이 읽는 요약은 이 파일.
 
 **Scope**: 디바이스 싱크 인프라 — 멀티 디바이스 메모리·설정 sync + marker block 도구 + 암호화 엔진 설계. CLI tool + setup script.
 
 ---
 
 ## [Unreleased]
+
+_(다음 변경 누적)_
+
+## [0.1.0] - 2026-05-26
+
+첫 SemVer baseline — 기록·마일스톤 도장 (소비자 대기 X). marker block 도구(`setup.sh` `install_or_update_marker_block` + `templates/sync-section.md`)와 v2.2 transcrypt 암호화 설계·Spike 4건이 안정 표면.
 
 ### Added (2026-05-13~14)
 - `install_or_update_marker_block` 함수 (`setup.sh`) — 외부 파일의 marker block (`<!-- bobusang:start --> ... <!-- bobusang:end -->`)을 idempotent install/update. dry test 통과
