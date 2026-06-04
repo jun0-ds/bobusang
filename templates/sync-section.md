@@ -35,7 +35,7 @@ main ← 모든 기기가 직접 push/pull
 1. 브랜치 확인: main이 아니면 `git checkout main`
 2. 최신화: `git fetch origin && git rebase origin/main`
 3. 상태 확인: `git status --short` → 변경 없으면 다음 리포로
-4. 스테이징: `git add settings.json CLAUDE.md hooks/ settings.local.d/ docs/ .gitignore`
+4. 스테이징: `git add settings.json CLAUDE.md hooks/ docs/ .gitignore`
    - `projects/*/memory/`, `projects/**/*.jsonl`, `/memory`·`/notes` symlink는 .gitignore 대상 — 커밋하지 않음. sonmat ops 메모리·scribe 로그 변경은 munteok-anchae에서 (env redirect — §sonmat).
 
 **munteok-anchae (`~/control-tower/munteok-anchae/`) — 메모리·노트 변경은 여기:**
@@ -58,7 +58,7 @@ main ← 모든 기기가 직접 push/pull
 
 - 일반 동기화: `sync: 설명 ({hostname} {날짜})`
 - 구조변경 포함: `sync: [구조변경] 설명 ({hostname} {날짜})`
-  - 구조변경 = CLAUDE.md, settings.json, hooks/, settings.local.d/ 변경
+  - 구조변경 = CLAUDE.md, settings.json, hooks/ 변경
   - 다른 기기 세션 시작 시 `detect-changes.sh`가 `[구조변경]` 커밋을 감지하여 경고
 - 기능 추가/변경: `feat: 설명`
 
@@ -82,7 +82,7 @@ git log -1 --format='%(trailers)'  # Co-Authored-By: Claude... 한 줄 있어야
 ### 새 세션 권장
 
 대화 중 아래 항목에 변경이 발생하면 사용자에게 새 세션 권장을 안내한다:
-- settings.json, settings.local.d/, CLAUDE.md 등 설정 파일 수정
+- settings.json, CLAUDE.md 등 설정 파일 수정
 - 글로벌/프로젝트 메모리 구조 변경 (파일 이동, 삭제, 대규모 정리)
 - sonmat 등 플러그인 업데이트 (git pull, 재설치)
 - hooks/ 수정

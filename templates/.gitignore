@@ -18,7 +18,6 @@ tool-results/
 
 # Device-specific settings
 settings.local.json
-settings.local.d/
 
 # Plugins (installed per-device)
 plugins/
