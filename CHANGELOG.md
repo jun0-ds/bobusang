@@ -10,7 +10,8 @@ All notable changes to bobusang. Format loosely follows [Keep a Changelog](https
 
 ## [Unreleased]
 
-_(다음 변경 누적)_
+### Changed (2026-06-12)
+- `templates/sync-section.md` 슬림화 — 91줄의 fat sync 절차를 ~10줄 router 포인터로 줄였다. marker block 메커니즘은 그대로(setup.sh 무변경, 여전히 CLAUDE.md에 `bobusang:sync` marker를 install/update) 두고 payload만 축소 — RFC-002의 "marker ≠ 축소" 해법(marker 유지 + payload 축소를 동시에). 절차 세부(두 리포 구조·자동/수동 싱크·커밋 컨벤션·attribution·새 세션 권장)는 maintainer instance 쪽 leaf `docs/sync-guide.md`로 이전. always-on 규칙(브랜치=main·싱크 trigger 키워드·Co-Authored-By trailer·구조변경 신호)만 template에 남겼다. fork 사용자는 이 template을 자기 topology로 교체.
 
 ## [0.1.0] - 2026-05-26
 
